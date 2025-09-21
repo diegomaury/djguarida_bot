@@ -3,6 +3,7 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 import config
 from youtube_service import search_and_add
+import pytz
 
 DB = 'db.sqlite'
 
@@ -110,55 +111,4 @@ async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         song_id = int(context.args[0])
     except ValueError:
-        await safe_reply(update, "ID inválido")
-        return
-    conn = sqlite3.connect(DB)
-    c = conn.cursor()
-    c.execute("DELETE FROM songs WHERE id=?", (song_id,))
-    conn.commit()
-    conn.close()
-    await safe_reply(update, "Sugerencia eliminada.")
-
-async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    msg = update.message
-    if msg:
-        if msg.from_user:
-            user = msg.from_user.username or msg.from_user.first_name
-        else:
-            user = "Anónimo"
-        if msg.text:
-            text = msg.text.strip()
-            add_song(user, text)
-            await msg.reply_text(
-                f"🎧🔥 Gracias {user}. Tu sugerencia '{text}' quedó pendiente de aprobación.\n"
-                "Ahora regresa a la sala y fuma 3 nubes seguidas. Yo sé que puedes. 😈💨💨💨"
-            )
-        else:
-            await msg.reply_text("No se recibió texto en el mensaje.")
-
-# -------------------------
-# Main
-# -------------------------
-import pytz
-from telegram.ext import ApplicationBuilder
-
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-import pytz
-
-scheduler = AsyncIOScheduler(timezone=pytz.timezone("America/Mexico_City"))
-
-
-def main():
-    init_db()
-    app = ApplicationBuilder().token(config.TELEGRAM_TOKEN).build()
-
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("review", review))
-    app.add_handler(CommandHandler("approve", approve))
-    app.add_handler(CommandHandler("delete", delete))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
-
-    app.run_polling()
-
-if __name__ == "__main__":
-    main()
+        await safe_reply(update, "No hay canciones pendientes.")
