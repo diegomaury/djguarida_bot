@@ -1,0 +1,23 @@
+# Archivos de credenciales y secretos
+client_secret.json
+token.pickle
+config.py
+db.sqlite
+
+# Virtualenv
+.venv/
+env/
+venv/
+
+# Archivos de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Archivos de logs
+*.log
+
+# Archivos temporales del sistema
+.DS_Store
+Thumbs.db
